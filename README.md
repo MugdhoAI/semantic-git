@@ -22,32 +22,75 @@ Example:
 feat(parser): reject messages with an unknown type
 ```
 
-## Planned usage
+## Usage
 
-Nothing in this section exists yet. These commands describe the intended workflow for the first working version. They are a plan, not instructions for a tool you can run today.
+The first working version is implemented. Install it in editable mode,
+then validate one commit message at a time:
 
-- `semantic-git check <message>`: validate a single commit message and report what is wrong with it, if anything.
+```
+pip install -e .
+semantic-git check "feat(parser): reject messages with an unknown type"
+```
+
+A message that follows the rules prints `PASS` and exits with status 0.
+A message that breaks the rules prints `FAIL`, one reason per problem,
+and exits with status 1. You can also run it without installing:
+
+```
+python -m semantic_git check "fix: correct the comment range"
+```
+
+These commands are still planned, not built yet:
+
 - `semantic-git check --range <range>`: validate every commit message in a range of git history.
 - `semantic-git init`: write a starter configuration file that sets the allowed types, scopes, and description length limits for a repository.
 - A git hook mode, where validation runs automatically when a commit is created and blocks messages that do not follow the configured rules.
 
+## Configuration
+
+Rules live in `semantic-git.toml` (or `.semantic-git.toml`) in the
+repository root or any parent directory. Every key is optional:
+
+```toml
+allowed_types = ["feat", "fix", "docs"]
+max_description_length = 50
+require_scope = true
+allow_breaking = false
+```
+
+The defaults are the eleven common types (feat, fix, docs, style,
+refactor, perf, test, build, ci, chore, revert), a description limit of
+72 characters, no required scope, and breaking changes allowed. Pass a
+different file with `semantic-git check --config path/to/config.toml`.
+
 ## First scope
 
-The first working version will:
+The first working version now:
 
-- Validate one commit message at a time against the semantic format.
-- Check the type against a configurable list of allowed types.
-- Check that a description is present and within a configurable length limit.
-- Print a clear pass or fail result, with a specific reason for each failure.
-- Read its rules from a simple configuration file.
+- Validates one commit message at a time against the semantic format.
+- Checks the type against a configurable list of allowed types.
+- Checks that a description is present and within a configurable length limit.
+- Prints a clear pass or fail result, with a specific reason for each failure.
+- Reads its rules from a simple configuration file.
 
-The first working version will not:
+The first working version does not:
 
 - Rewrite or fix commit messages automatically.
 - Generate changelogs or release notes.
 - Integrate with hosting platforms or CI services.
 - Support plugins or custom validation rules written as code.
 
+## Development
+
+Run the test suite with pytest:
+
+```
+pytest
+```
+
 ## Status
 
-This repository is at the planning stage. There is no code, no installer, and nothing to run yet. This README defines the project so the first implementation has a clear target to build against.
+The first working version is done: `semantic-git check` validates one
+message against configurable rules, and the rules load from a TOML config
+file. The remaining planned work is range checking, the `init` command,
+and the git hook mode.
